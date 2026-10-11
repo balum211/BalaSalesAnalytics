@@ -1,0 +1,80 @@
+// =====================================================================
+// ChainSight — Power BI DAX measures
+// Create a blank table named "_Measures" (Enter data → OK) and add each measure below.
+// Definitions match public/js/analytics.js so the web portal and Power BI agree.
+// =====================================================================
+
+Revenue = SUM ( FactSales[revenue] )
+
+COGS = SUM ( FactSales[cogs] )
+
+Freight Cost = SUM ( FactSales[shipping_cost] )
+
+Gross Profit = SUM ( FactSales[gross_profit] )
+
+Gross Margin % = DIVIDE ( [Gross Profit], [Revenue] )
+
+Orders = COUNTROWS ( FactSales )
+
+Units = SUM ( FactSales[quantity] )
+
+Avg Order Value = DIVIDE ( [Revenue], [Orders] )
+
+Freight % of Revenue = DIVIDE ( [Freight Cost], [Revenue] )
+
+Delivered Orders (OTD base) =
+    CALCULATE ( [Orders], FactSales[on_time] IN { "Yes", "No" } )
+
+On-Time Orders = CALCULATE ( [Orders], FactSales[on_time] = "Yes" )
+
+Late Orders = CALCULATE ( [Orders], FactSales[on_time] = "No" )
+
+On-Time Delivery % = DIVIDE ( [On-Time Orders], [Delivered Orders (OTD base)] )
+
+Avg Delivery Days = AVERAGE ( FactSales[actual_days] )
+
+Avg Promised Days = AVERAGE ( FactSales[promised_days] )
+
+Delivery Delay (days) = [Avg Delivery Days] - [Avg Promised Days]
+
+Return Rate % = DIVIDE ( CALCULATE ( [Orders], FactSales[order_status] = "Returned" ), [Orders] )
+
+Cancel Rate % = DIVIDE ( CALCULATE ( [Orders], FactSales[order_status] = "Cancelled" ), [Orders] )
+
+// ---------- Time intelligence (requires DimDate marked as Date table) ----------
+
+Revenue PY = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+Revenue YoY % = DIVIDE ( [Revenue] - [Revenue PY], [Revenue PY] )
+
+Gross Profit PY = CALCULATE ( [Gross Profit], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+Gross Profit YoY % = DIVIDE ( [Gross Profit] - [Gross Profit PY], [Gross Profit PY] )
+
+OTD % PY = CALCULATE ( [On-Time Delivery %], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+OTD Change (pts) = ( [On-Time Delivery %] - [OTD % PY] ) * 100
+
+Revenue YTD = TOTALYTD ( [Revenue], DimDate[Date] )
+
+Revenue 3M Rolling =
+    CALCULATE ( [Revenue], DATESINPERIOD ( DimDate[Date], MAX ( DimDate[Date] ), -3, MONTH ) )
+
+// ---------- Targets & conditional formatting ----------
+
+OTD Target = 0.90
+
+OTD Status Color =
+    SWITCH (
+        TRUE (),
+        [On-Time Delivery %] >= 0.90, "#2fbf71",
+        [On-Time Delivery %] >= 0.85, "#e3a008",
+        "#ef5d5d"
+    )
+
+Carrier Rank by OTD = RANKX ( ALL ( DimCarrier[carrier] ), [On-Time Delivery %], , DESC, DENSE )
+
+// Dynamic title for the report header
+Report Subtitle =
+    "Showing " & FORMAT ( [Orders], "#,0" ) & " orders · " &
+    FORMAT ( MIN ( DimDate[Date] ), "mmm yyyy" ) & " – " & FORMAT ( MAX ( DimDate[Date] ), "mmm yyyy" )

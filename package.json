@@ -1,0 +1,19 @@
+{
+  "name": "bala-sales-analytics",
+  "version": "1.0.0",
+  "description": "ChainSight \u2014 Supply Chain Sales Analytics portal (zero-dependency Node.js + Chart.js) with a companion Power BI report. Week 1 project, The Gen Academy \u2013 Mastering Agentic AI.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "generate": "node scripts/generate-data.js",
+    "powerbi": "node scripts/build-powerbi-tables.js",
+    "test": "node scripts/smoke-test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Bala Mallampati",
+  "license": "MIT",
+  "dependencies": {}
+}

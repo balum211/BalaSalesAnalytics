@@ -1,0 +1,50 @@
+{
+  "name": "ChainSight Midnight",
+  "dataColors": ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"],
+  "background": "#0b1220",
+  "foreground": "#eef2f8",
+  "tableAccent": "#3987e5",
+  "good": "#2fbf71",
+  "neutral": "#e3a008",
+  "bad": "#ef5d5d",
+  "maximum": "#104281",
+  "center": "#86b6ef",
+  "minimum": "#cde2fb",
+  "textClasses": {
+    "callout": { "fontSize": 28, "fontFace": "Segoe UI Semibold", "color": "#eef2f8" },
+    "title": { "fontSize": 13, "fontFace": "Segoe UI Semibold", "color": "#eef2f8" },
+    "header": { "fontSize": 12, "fontFace": "Segoe UI Semibold", "color": "#a9b4c8" },
+    "label": { "fontSize": 10, "fontFace": "Segoe UI", "color": "#a9b4c8" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#111a2c" } }, "transparency": 0 }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#22314f" } }, "radius": 12 }],
+        "visualHeader": [{ "foreground": { "solid": { "color": "#a9b4c8" } } }],
+        "title": [{ "fontColor": { "solid": { "color": "#eef2f8" } }, "fontSize": 12 }],
+        "categoryAxis": [{ "labelColor": { "solid": { "color": "#a9b4c8" } }, "gridlineShow": false }],
+        "valueAxis": [{ "labelColor": { "solid": { "color": "#a9b4c8" } }, "gridlineColor": { "solid": { "color": "#22314f" } } }],
+        "legend": [{ "labelColor": { "solid": { "color": "#a9b4c8" } } }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#0b1220" } }, "transparency": 0 }],
+        "outspace": [{ "color": { "solid": { "color": "#0b1220" } } }]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [{ "color": { "solid": { "color": "#eef2f8" } }, "fontSize": 26 }],
+        "categoryLabels": [{ "color": { "solid": { "color": "#7a879e" } } }]
+      }
+    },
+    "slicer": {
+      "*": {
+        "items": [{ "fontColor": { "solid": { "color": "#eef2f8" } }, "background": { "solid": { "color": "#16223a" } } }],
+        "header": [{ "fontColor": { "solid": { "color": "#a9b4c8" } } }]
+      }
+    }
+  }
+}

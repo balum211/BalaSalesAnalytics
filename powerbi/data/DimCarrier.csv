@@ -1,0 +1,21 @@
+CarrierKey,carrier,ship_mode
+1,Coastal Shipping Co,Air
+2,BlueLine Logistics,Road
+3,Coastal Shipping Co,Road
+4,Meridian Express,Rail
+5,Atlas Freight,Road
+6,Coastal Shipping Co,Ocean
+7,SkyBridge Cargo,Road
+8,Meridian Express,Road
+9,Meridian Express,Air
+10,BlueLine Logistics,Ocean
+11,Atlas Freight,Ocean
+12,Meridian Express,Ocean
+13,Atlas Freight,Rail
+14,SkyBridge Cargo,Ocean
+15,Coastal Shipping Co,Rail
+16,BlueLine Logistics,Rail
+17,BlueLine Logistics,Air
+18,Atlas Freight,Air
+19,SkyBridge Cargo,Rail
+20,SkyBridge Cargo,Air

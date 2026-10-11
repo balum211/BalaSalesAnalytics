@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Supply Chain Sales Analytics</title>
+  <meta name="description" content="Sales and logistics analytics portal for a global supply chain — built with Node.js and Claude Code." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Cpath d='M7 22h4v-6H7zm7 0h4V10h-4zm7 0h4v-9h-4z' fill='white'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M6 23h5v-7H6zm7.5 0h5V9h-5zM21 23h5V13h-5z" fill="currentColor"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">ChainSight</div>
+          <div class="brand-sub">Supply Chain Sales Analytics</div>
+        </div>
+      </div>
+      <nav class="nav" role="tablist" aria-label="Views">
+        <button class="nav-item active" data-view="overview" role="tab"><span class="ico">◆</span>Executive Overview</button>
+        <button class="nav-item" data-view="logistics" role="tab"><span class="ico">⛟</span>Logistics &amp; Delivery</button>
+        <button class="nav-item" data-view="products" role="tab"><span class="ico">▦</span>Products &amp; Customers</button>
+        <button class="nav-item" data-view="orders" role="tab"><span class="ico">☰</span>Orders Explorer</button>
+        <button class="nav-item" data-view="insights" role="tab"><span class="ico">✦</span>AI Insights</button>
+        <button class="nav-item" data-view="powerbi" role="tab"><span class="ico">▣</span>Power BI Report</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="theme-label">Theme</span>
+        <div class="theme-swatches" id="themeSwatches" role="radiogroup" aria-label="Theme"></div>
+        <p class="foot-note">Built with Node.js · Chart.js · Power BI<br />Vibe-coded with Claude Code</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+        <div>
+          <h1 id="viewTitle">Executive Overview</h1>
+          <p class="subtitle" id="viewSubtitle">Revenue, profitability and service level across the global network</p>
+        </div>
+        <div class="topbar-right">
+          <span class="pill" id="rowCount">— orders</span>
+          <span class="pill pill-live" id="apiStatus" title="Data source">Static data</span>
+        </div>
+      </header>
+
+      <section class="filters" aria-label="Filters">
+        <div class="f"><label for="fFrom">From</label><input type="date" id="fFrom" /></div>
+        <div class="f"><label for="fTo">To</label><input type="date" id="fTo" /></div>
+        <div class="f"><label for="f_region">Region</label><select id="f_region" data-dim="region"></select></div>
+        <div class="f"><label for="f_product_category">Category</label><select id="f_product_category" data-dim="product_category"></select></div>
+        <div class="f"><label for="f_customer_segment">Segment</label><select id="f_customer_segment" data-dim="customer_segment"></select></div>
+        <div class="f"><label for="f_ship_mode">Ship mode</label><select id="f_ship_mode" data-dim="ship_mode"></select></div>
+        <div class="f"><label for="f_carrier">Carrier</label><select id="f_carrier" data-dim="carrier"></select></div>
+        <div class="f f-btns">
+          <div class="quick" role="group" aria-label="Quick ranges">
+            <button data-range="2024">2024</button><button data-range="2025">2025</button><button data-range="all">All</button>
+          </div>
+          <button class="btn-ghost" id="resetBtn">Reset</button>
+        </div>
+      </section>
+
+      <div id="emptyState" class="empty" hidden>
+        <div class="empty-ico">∅</div>
+        <h2>No orders match these filters</h2>
+        <p>Try widening the date range or setting a filter back to “All”.</p>
+        <button class="btn" id="emptyReset">Reset filters</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <section class="view active" id="view-overview">
+        <div class="kpis" id="kpiGrid"></div>
+        <div class="grid g-2-1">
+          <article class="card">
+            <header class="card-h"><h3>Monthly revenue &amp; gross profit</h3><span class="unit">USD</span></header>
+            <div class="chart-wrap tall"><canvas id="cTrend"></canvas></div>
+          </article>
+          <article class="card">
+            <header class="card-h"><h3>Revenue by region</h3><span class="unit">USD</span></header>
+            <div class="chart-wrap tall"><canvas id="cRegion"></canvas></div>
+          </article>
+        </div>
+        <div class="grid g-1-1">
+          <article class="card">
+            <header class="card-h"><h3>Revenue by product category</h3><span class="unit">USD</span></header>
+            <div class="chart-wrap"><canvas id="cCategory"></canvas></div>
+          </article>
+          <article class="card">
+            <header class="card-h"><h3>Revenue by customer segment</h3><span class="unit">USD</span></header>
+            <div class="chart-wrap"><canvas id="cSegment"></canvas></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- LOGISTICS -->
+      <section class="view" id="view-logistics">
+        <div class="kpis" id="kpiLogistics"></div>
+        <div class="grid g-1-1">
+          <article class="card">
+            <header class="card-h"><h3>On-time delivery by carrier</h3><span class="unit">% of delivered orders · target 90%</span></header>
+            <div class="chart-wrap"><canvas id="cCarrier"></canvas></div>
+          </article>
+          <article class="card">
+            <header class="card-h"><h3>Promised vs actual lead time by ship mode</h3><span class="unit">days</span></header>
+            <div class="chart-wrap"><canvas id="cLead"></canvas></div>
+          </article>
+        </div>
+        <div class="grid g-2-1">
+          <article class="card">
+            <header class="card-h"><h3>On-time delivery trend</h3><span class="unit">% per month</span></header>
+            <div class="chart-wrap"><canvas id="cOtdTrend"></canvas></div>
+          </article>
+          <article class="card">
+            <header class="card-h"><h3>Freight cost as % of revenue</h3><span class="unit">%</span></header>
+            <div class="chart-wrap"><canvas id="cFreight"></canvas></div>
+          </article>
+        </div>
+        <article class="card">
+          <header class="card-h"><h3>Warehouse performance</h3><span class="unit">all figures for the current filter</span></header>
+          <div class="table-wrap"><table class="tbl" id="tWarehouse"></table></div>
+        </article>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="view" id="view-products">
+        <div class="grid g-1-1">
+          <article class="card">
+            <header class="card-h"><h3>Top 10 products by revenue</h3><span class="unit">USD</span></header>
+            <div class="chart-wrap tall"><canvas id="cProducts"></canvas></div>
+          </article>
+          <article class="card">
+            <header class="card-h"><h3>Gross margin by category</h3><span class="unit">% of revenue</span></header>
+            <div class="chart-wrap tall"><canvas id="cMargin"></canvas></div>
+          </article>
+        </div>
+        <article class="card">
+          <header class="card-h"><h3>Top customers</h3><span class="unit">ranked by revenue</span></header>
+          <div class="table-wrap"><table class="tbl" id="tCustomers"></table></div>
+        </article>
+      </section>
+
+      <!-- ORDERS -->
+      <section class="view" id="view-orders">
+        <article class="card">
+          <header class="card-h orders-h">
+            <h3>Orders</h3>
+            <div class="orders-tools">
+              <input type="search" id="orderSearch" placeholder="Search order, customer, product, country, carrier…" aria-label="Search orders" />
+              <button class="btn" id="exportBtn">Export CSV</button>
+            </div>
+          </header>
+          <div class="table-wrap"><table class="tbl tbl-orders" id="tOrders"></table></div>
+          <footer class="pager"><span id="pageInfo"></span><div><button class="btn-ghost" id="prevPage">‹ Prev</button><button class="btn-ghost" id="nextPage">Next ›</button></div></footer>
+        </article>
+      </section>
+
+      <!-- INSIGHTS -->
+      <section class="view" id="view-insights">
+        <div class="insights-head card">
+          <div>
+            <h3>Automated insights</h3>
+            <p class="muted" id="insightSource">Generated from the filtered data.</p>
+          </div>
+          <button class="btn" id="refreshInsights">Regenerate</button>
+        </div>
+        <div class="insights" id="insightList"></div>
+      </section>
+
+      <!-- POWER BI -->
+      <section class="view" id="view-powerbi">
+        <article class="card">
+          <header class="card-h"><h3>Power BI report</h3><span class="unit">embedded via “Publish to web”</span></header>
+          <div id="pbiFrame" class="pbi"></div>
+          <div class="pbi-help">
+            <p>The same dataset powers a Power BI report (<code>powerbi/</code> folder in the repo has the theme, DAX measures and build guide).</p>
+            <p>To embed it here: in Power BI Service choose <b>File → Embed report → Publish to web</b>, copy the link and set <code>POWERBI_EMBED_URL</code> in <code>public/js/config.js</code>.</p>
+          </div>
+        </article>
+      </section>
+
+      <footer class="page-foot">Dataset: 6,000 synthetic orders · Jan 2024 – Dec 2025 · 5 regions · 6 warehouses · 5 carriers</footer>
+    </main>
+  </div>
+
+  <div class="tooltip-note" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/chart.umd.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
