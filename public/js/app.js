@@ -540,7 +540,7 @@
     const url = cfg.LOOKER_EMBED_URL || cfg.POWERBI_EMBED_URL;
     const box = $('#pbiFrame');
     if (url) {
-      box.innerHTML = `<iframe title="Supply chain sales BI report" src="${encodeURI(url)}" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+      box.innerHTML = `<iframe title="Supply chain sales BI report" src="${encodeURI(url)}" allowfullscreen loading="lazy"></iframe>`;
       const view = cfg.LOOKER_VIEW_URL || url.replace('/embed/', '/');
       $('#lookerOpen').innerHTML = `<a class="btn" href="${encodeURI(view)}" target="_blank" rel="noopener">Open the report in Looker Studio ↗</a>`;
     } else {

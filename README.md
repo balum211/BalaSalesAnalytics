@@ -10,7 +10,7 @@ It has two front ends that read the same dataset:
 2. **Power BI report**: a star-schema model, DAX measures and a matching theme. It is embedded in the portal through Publish-to-web.
 
 🔗 **Live portal:** `https://balum211.github.io/BalaSalesAnalytics/` *(after GitHub Pages is enabled — see below)*
-🔗 **Power BI report:** *add your Publish-to-web link here*
+🔗 **Looker Studio (Data Studio) report — public:** https://datastudio.google.com/reporting/af6d4833-860b-468b-8e90-b47cda2962aa/page/tEnnC (embedded in the portal's *BI Report* tab)
 🎥 **Demo video:** *add your Loom link here*
 
 ![Executive overview](docs/screenshots/overview-horizon.png)
@@ -37,7 +37,7 @@ Today these answers are spread across spreadsheets. ChainSight puts them in one 
 | **Orders Explorer** | Search across order, customer, product, country and carrier · sortable columns · pagination · **Export CSV** of the filtered set |
 | **AI Insights** | Automatically generated findings: growth, risks, cost levers. If `ANTHROPIC_API_KEY` is set, **Claude** writes the executive summary from aggregated metrics only (raw rows are never sent). |
 | **Ask the Data (chatbot)** | Ask questions in plain English, such as "Which carrier has the worst on-time delivery?", "Compare Europe vs Asia Pacific profit" or "Monthly revenue trend in 2025". Answers come with a chart, a data table and a **Show this on the dashboard** button. With `ANTHROPIC_API_KEY` set, **Claude** answers by calling a `query_sales` tool that runs on the same KPI engine (an agentic tool-use loop). Without a key, a built-in analyst parses the question and runs the query in your browser. |
-| **Power BI Report** | Embedded Power BI report (configure in `public/js/config.js`) |
+| **BI Report (Looker)** | Public **Looker Studio (Data Studio)** report embedded in the portal. It has a Google Maps bubble map of revenue by country (coloured by region), KPI scorecards with sparklines, date/region/carrier/category controls, a category donut, a monthly trend, on-time % by carrier, and a warehouse heatmap table. The data reaches it through a Google Sheet that `IMPORTDATA`s `data/looker_sales.csv` from this repo. |
 
 - **Global filters** (date range, region, category, segment, ship mode, carrier) apply to every view. Quick buttons switch between 2024, 2025 and All.
 - **Clear empty state** when no orders match the filters.

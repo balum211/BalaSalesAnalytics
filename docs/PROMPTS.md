@@ -92,6 +92,30 @@ Mobile check: no horizontal scroll at 390px.
 
 **Result:** a new default **Horizon** theme (light, glassy cards, soft gradients, light sidebar), with all sidebar colors moved into theme tokens. Also added KPI sparklines, a region × category heatmap, and a segment donut with a clickable legend. Clicking any bar, slice, cell or warehouse row filters the whole dashboard, with removable filter chips. Visual QA caught overlapping carrier labels (now wrapped) and empty space in KPI tiles without sparklines.
 
+## Iteration 10: Looker Studio report with Google Maps, embedded in the portal
+**Prompts:**
+> Lets go with Looker Studio option, can you create a Looker dashboards and embed into this web portal.
+> Add Google Maps visuals in landing page of Looker Datastudio and also make it rich look and interactive and public & embed in above webportal.
+
+**What was built (Claude drove the browser):**
+1. `scripts/build-looker-csv.js` writes `data/looker_sales.csv`, with readable column names and numeric flags (`On-Time Flag`, so AVG gives the on-time rate).
+2. A Google Sheet uses `=IMPORTDATA("https://raw.githubusercontent.com/balum211/BalaSalesAnalytics/main/data/looker_sales.csv")`, so the report updates whenever the repo does.
+3. A Looker Studio report was created through the Linking API URL (`/reporting/create?ds.*.connector=googleSheets…`), with:
+   - the Fog theme, fit-to-width, and a 1200×1500 canvas
+   - a title, a date range control, and Region, Carrier and Product Category drop-downs
+   - 4 scorecards with monthly sparklines (Revenue, Gross Profit, Orders, On-Time Delivery % as AVG of the flag, shown as a percent)
+   - a **Google Maps bubble map** (location = Country, colour = Region, size = Revenue)
+   - a revenue-by-category donut, a monthly Revenue and Gross Profit time series, on-time % by carrier, and a warehouse table with heatmap colouring
+4. Sharing was set to **Public (viewer)**, embedding was turned on, and the embed URL is in `public/js/config.js`, so it renders in the portal's BI tab.
+
+**🐞 Issues and fixes:**
+- *Power BI Publish to web needs a work or school account* → switched to Looker Studio, which is free with Gmail.
+- *The built-in browser pane was too narrow for the report editor*, and its canvas sits in a CSS-scaled frame that refuses clicks → moved to Claude in Chrome with a full window.
+- *Chrome freezes hidden tabs* → asked the user to keep the window visible.
+- *Text set at size 26 rendered at size 1*, because typing into the size box applies each keystroke → stepped the size with the spinner while the text was selected.
+- *Scrolling over the map panned it* → used the map's re-centre button.
+- *A stray click on the legend applied a "North America" cross-filter* → removed the filter chip.
+
 ---
 
 ## Learnings
