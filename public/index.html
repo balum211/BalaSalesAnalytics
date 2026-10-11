@@ -29,13 +29,13 @@
         <button class="nav-item" data-view="products" role="tab"><span class="ico">▦</span>Products &amp; Customers</button>
         <button class="nav-item" data-view="orders" role="tab"><span class="ico">☰</span>Orders Explorer</button>
         <button class="nav-item" data-view="insights" role="tab"><span class="ico">✦</span>AI Insights</button>
-        <button class="nav-item" data-view="powerbi" role="tab"><span class="ico">▣</span>Power BI Report</button>
+        <button class="nav-item" data-view="powerbi" role="tab"><span class="ico">▣</span>BI Report (Looker)</button>
         <button class="nav-item nav-ask" id="navAsk" type="button"><span class="ico">✉</span>Ask the Data</button>
       </nav>
       <div class="sidebar-foot">
         <span class="theme-label">Theme</span>
         <div class="theme-swatches" id="themeSwatches" role="radiogroup" aria-label="Theme"></div>
-        <p class="foot-note">Built with Node.js · Chart.js · Power BI<br />Vibe-coded with Claude Code</p>
+        <p class="foot-note">Built with Node.js · Chart.js · Looker Studio<br />Vibe-coded with Claude Code</p>
       </div>
     </aside>
 
@@ -184,11 +184,17 @@
       <!-- POWER BI -->
       <section class="view" id="view-powerbi">
         <article class="card">
-          <header class="card-h"><h3>Power BI report</h3><span class="unit">embedded via “Publish to web”</span></header>
+          <header class="card-h"><h3>Looker Studio report</h3><span class="unit">live, interactive BI report on the same dataset</span></header>
           <div id="pbiFrame" class="pbi"></div>
+          <div class="pbi-help" id="lookerHelp">
+            <p>Built in Google Looker Studio from <code>data/looker_sales.csv</code> (loaded into Google Sheets). Use the report's own date and dimension controls to explore it.</p>
+            <p id="lookerOpen"></p>
+          </div>
+        </article>
+        <article class="card">
+          <header class="card-h"><h3>Power BI kit</h3><span class="unit">for Power BI Desktop</span></header>
           <div class="pbi-help">
-            <p>The same dataset powers a Power BI report (<code>powerbi/</code> folder in the repo has the theme, DAX measures and build guide).</p>
-            <p>To embed it here: in Power BI Service choose <b>File → Embed report → Publish to web</b>, copy the link and set <code>POWERBI_EMBED_URL</code> in <code>public/js/config.js</code>.</p>
+            <p>The repo's <code>powerbi/</code> folder holds a star-schema model (FactSales + 5 dimensions), DAX measures that match this portal's KPIs, a matching theme and a step-by-step build guide. Power BI's Publish to web needs a work or school account, so the live embed above uses Looker Studio instead.</p>
           </div>
         </article>
       </section>

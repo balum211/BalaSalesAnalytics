@@ -24,7 +24,7 @@
     products: ['Products & Customers', 'What sells, what earns margin, and who buys'],
     orders: ['Orders Explorer', 'Search, sort and export order-level detail'],
     insights: ['AI Insights', 'Automatically generated findings for the current filter'],
-    powerbi: ['Power BI Report', 'The same dataset modelled in Power BI'],
+    powerbi: ['BI Report', 'Interactive Looker Studio report on the same data'],
   };
 
   // ---------- formatting ----------
@@ -536,11 +536,19 @@
 
   // ---------- Power BI ----------
   function renderPowerBI() {
-    const url = (window.APP_CONFIG || {}).POWERBI_EMBED_URL;
+    const cfg = window.APP_CONFIG || {};
+    const url = cfg.LOOKER_EMBED_URL || cfg.POWERBI_EMBED_URL;
     const box = $('#pbiFrame');
-    if (url) box.innerHTML = `<iframe title="Supply Chain Sales Power BI report" src="${encodeURI(url)}" allowfullscreen></iframe>`;
-    else box.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:34px">▣</div><b>Power BI report not linked yet</b><br/><span>Add your Publish-to-web URL in <code>public/js/config.js</code>.</span></div>';
+    if (url) {
+      box.innerHTML = `<iframe title="Supply chain sales BI report" src="${encodeURI(url)}" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+      const view = cfg.LOOKER_VIEW_URL || url.replace('/embed/', '/');
+      $('#lookerOpen').innerHTML = `<a class="btn" href="${encodeURI(view)}" target="_blank" rel="noopener">Open the report in Looker Studio ↗</a>`;
+    } else {
+      box.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:34px">▣</div><b>BI report not linked yet</b><br/><span>Add your Looker Studio embed URL as <code>LOOKER_EMBED_URL</code> in <code>public/js/config.js</code>.</span></div>';
+      $('#lookerOpen').innerHTML = '';
+    }
   }
+
 
   function toast(msg) {
     const t = $('#toast'); t.textContent = msg; t.classList.add('show');
