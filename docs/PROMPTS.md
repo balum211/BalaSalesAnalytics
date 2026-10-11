@@ -67,6 +67,31 @@ Mobile check: no horizontal scroll at 390px.
 
 **Result:** `npm test` passes. `.github/workflows/pages.yml` and `.vscode/launch.json` were added.
 
+## Iteration 8: "Ask the data" chatbot
+**Prompt:**
+> Add a chatbot to the dashboard so a user can ask any question about the sales data.
+
+**Result:**
+- `public/js/chat-engine.js` has two parts. `runQuery(spec)` is a structured query (metrics × group_by × filters × sort × limit). `answer(question)` is a built-in analyst that parses plain-English questions (metrics, dimensions, entity names, years, quarters, months, top/bottom N, compare, growth, trend) into a query and writes the answer.
+- `POST /api/chat`: when `ANTHROPIC_API_KEY` is set, **Claude gets `runQuery` as a `query_sales` tool** and loops through tool calls (up to 8) before answering. It never invents numbers. On any error the built-in analyst answers instead.
+- `public/js/chat-ui.js`: a floating "Ask the data" panel with suggestion chips, mini charts, data tables, a "Show this on the dashboard" button, Ctrl+K to open, and mobile full-screen.
+
+**🐞 Bugs found by the question test suite (`scripts/chat-test.js`):**
+| Issue | Fix |
+|---|---|
+| "How did revenue grow from 2024 to 2025?" said it *fell*, because years were sorted by value | Time dimensions now always sort chronologically |
+| "Which region grew fastest?" was read as a delivery-*speed* question | "fast/slow" maps to delivery time only when the question isn't about growth |
+| "late shipments by carrier" answered with order counts | Removed "shipments" as a synonym for orders |
+| Compare answers printed an empty "()" | Scope text is only added when it's non-empty |
+| The chat panel wouldn't open from the `#ask` link | The deep link is captured before the router rewrites the hash |
+| Chat line charts showed 0–11 instead of month names | Fixed the axis tick callback |
+
+## Iteration 9: Modern look and interactive analysis
+**Prompt:**
+> I want this dashboard more modern look, not black background, with themes, rich visuals, interactive for analysis.
+
+**Result:** a new default **Horizon** theme (light, glassy cards, soft gradients, light sidebar), with all sidebar colors moved into theme tokens. Also added KPI sparklines, a region × category heatmap, and a segment donut with a clickable legend. Clicking any bar, slice, cell or warehouse row filters the whole dashboard, with removable filter chips. Visual QA caught overlapping carrier labels (now wrapped) and empty space in KPI tiles without sparklines.
+
 ---
 
 ## Learnings

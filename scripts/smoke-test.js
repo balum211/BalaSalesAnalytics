@@ -16,6 +16,9 @@ server.listen(0, async () => {
     r = await get('/api/orders?size=10&page=2&carrier=Atlas%20Freight'); assert.equal(r.body.data.length, 10); assert.ok(r.body.data.every((o) => o.carrier === 'Atlas Freight'));
     r = await get('/api/kpis?from=2030-01-01'); assert.equal(r.body.orders, 0);
     r = await get('/api/insights', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }); assert.ok(r.body.insights.length >= 5);
+    r = await get('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question: 'Which carrier has the worst on-time delivery?' }) });
+    assert.ok(/Coastal Shipping Co/.test(r.body.text), 'chat answers carrier question');
+    r = await get('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }); assert.equal(r.status, 400);
     const page = await fetch(base + '/'); assert.equal(page.status, 200);
     const trav = await fetch(base + '/../server.js'); assert.notEqual(trav.status, 200);
     console.log('✔ all smoke tests passed');

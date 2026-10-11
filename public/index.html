@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-skin="midnight">
+<html lang="en" data-skin="horizon">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,6 +30,7 @@
         <button class="nav-item" data-view="orders" role="tab"><span class="ico">☰</span>Orders Explorer</button>
         <button class="nav-item" data-view="insights" role="tab"><span class="ico">✦</span>AI Insights</button>
         <button class="nav-item" data-view="powerbi" role="tab"><span class="ico">▣</span>Power BI Report</button>
+        <button class="nav-item nav-ask" id="navAsk" type="button"><span class="ico">✉</span>Ask the Data</button>
       </nav>
       <div class="sidebar-foot">
         <span class="theme-label">Theme</span>
@@ -46,6 +47,7 @@
           <p class="subtitle" id="viewSubtitle">Revenue, profitability and service level across the global network</p>
         </div>
         <div class="topbar-right">
+          <button class="ask-btn" id="askTop" type="button" aria-controls="chatPanel">✦ Ask the data</button>
           <span class="pill" id="rowCount">— orders</span>
           <span class="pill pill-live" id="apiStatus" title="Data source">Static data</span>
         </div>
@@ -67,6 +69,8 @@
         </div>
       </section>
 
+      <div class="active-chips" id="activeChips" hidden></div>
+
       <div id="emptyState" class="empty" hidden>
         <div class="empty-ico">∅</div>
         <h2>No orders match these filters</h2>
@@ -83,20 +87,24 @@
             <div class="chart-wrap tall"><canvas id="cTrend"></canvas></div>
           </article>
           <article class="card">
-            <header class="card-h"><h3>Revenue by region</h3><span class="unit">USD</span></header>
+            <header class="card-h"><h3>Revenue by region</h3><span class="unit">USD · click a bar to filter</span></header>
             <div class="chart-wrap tall"><canvas id="cRegion"></canvas></div>
           </article>
         </div>
         <div class="grid g-1-1">
           <article class="card">
-            <header class="card-h"><h3>Revenue by product category</h3><span class="unit">USD</span></header>
+            <header class="card-h"><h3>Revenue by product category</h3><span class="unit">USD · click a bar to filter</span></header>
             <div class="chart-wrap"><canvas id="cCategory"></canvas></div>
           </article>
           <article class="card">
-            <header class="card-h"><h3>Revenue by customer segment</h3><span class="unit">USD</span></header>
-            <div class="chart-wrap"><canvas id="cSegment"></canvas></div>
+            <header class="card-h"><h3>Customer segment mix</h3><span class="unit">share of revenue · click to filter</span></header>
+            <div class="donut-wrap"><div class="donut"><canvas id="cSegment"></canvas></div><div class="legend" id="segLegend"></div></div>
           </article>
         </div>
+        <article class="card">
+          <header class="card-h"><h3>Revenue heatmap: region × category</h3><span class="unit">USD · darker = more revenue · click a cell to drill in</span></header>
+          <div class="table-wrap"><div id="heatmap"></div></div>
+        </article>
       </section>
 
       <!-- LOGISTICS -->
@@ -123,7 +131,7 @@
           </article>
         </div>
         <article class="card">
-          <header class="card-h"><h3>Warehouse performance</h3><span class="unit">all figures for the current filter</span></header>
+          <header class="card-h"><h3>Warehouse performance</h3><span class="unit">click a row to filter by warehouse</span></header>
           <div class="table-wrap"><table class="tbl" id="tWarehouse"></table></div>
         </article>
       </section>
@@ -189,6 +197,31 @@
     </main>
   </div>
 
+  <button class="chat-fab" id="chatFab" type="button" aria-controls="chatPanel" aria-expanded="false" aria-label="Open the data assistant">
+    <span aria-hidden="true">✦</span><span class="fab-label">Ask the data</span>
+  </button>
+  <aside class="chat" id="chatPanel" aria-label="Data assistant" hidden>
+    <header class="chat-h">
+      <div class="chat-title">
+        <div class="chat-avatar" aria-hidden="true">✦</div>
+        <div>
+          <div class="chat-name">ChainSight Analyst</div>
+          <div class="chat-mode" id="chatMode">Built-in analyst · answers from the dataset</div>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <button class="icon-btn" id="chatClear" type="button" title="Start a new conversation" aria-label="Start a new conversation">↺</button>
+        <button class="icon-btn" id="chatClose" type="button" title="Close" aria-label="Close the assistant">✕</button>
+      </div>
+    </header>
+    <div class="chat-log" id="chatLog" aria-live="polite"></div>
+    <form class="chat-form" id="chatForm" autocomplete="off">
+      <label class="sr-only" for="chatInput">Ask a question about the sales data</label>
+      <textarea id="chatInput" rows="1" placeholder="Ask about revenue, carriers, delays, margins…" maxlength="500"></textarea>
+      <button class="chat-send" id="chatSend" type="submit" aria-label="Send">➤</button>
+    </form>
+  </aside>
+
   <div class="tooltip-note" id="toast" role="status" aria-live="polite"></div>
 
   <script src="vendor/chart.umd.js"></script>
@@ -196,5 +229,7 @@
   <script src="js/analytics.js"></script>
   <script src="js/themes.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/chat-engine.js"></script>
+  <script src="js/chat-ui.js"></script>
 </body>
 </html>

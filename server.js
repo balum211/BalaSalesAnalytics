@@ -13,6 +13,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const Analytics = require('./public/js/analytics.js');
+const Chat = require('./public/js/chat-engine.js');
 
 // --- tiny .env loader (no dotenv dependency) ---
 const envFile = path.join(__dirname, '.env');
@@ -81,6 +82,79 @@ async function claudeInsights(rows) {
   return JSON.parse(text.slice(text.indexOf('['), text.lastIndexOf(']') + 1));
 }
 
+
+// ---------------------------------------------------------------- Chatbot (Claude + tool use)
+const QUERY_TOOL = {
+  name: 'query_sales',
+  description: 'Run an aggregate query over the supply chain sales orders. Returns totals for the requested metrics and, ' +
+    'when group_by is set, one row per group (sorted by sort_by). Use it for EVERY number you state. ' +
+    'Filters accept a single value or a list of values. Dates are ISO strings (YYYY-MM-DD) on order_date.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      metrics: { type: 'array', items: { type: 'string', enum: Object.keys(Chat.METRICS) }, description: 'Metrics to compute' },
+      group_by: { type: 'string', enum: [...Object.keys(Chat.DIMS), 'none'], description: 'Dimension to break down by' },
+      filters: {
+        type: 'object',
+        properties: Object.fromEntries([
+          ['from', { type: 'string', description: 'Start date YYYY-MM-DD (inclusive)' }],
+          ['to', { type: 'string', description: 'End date YYYY-MM-DD (inclusive)' }],
+          ...Chat.FILTER_DIMS.map((d) => [d, { anyOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }] }]),
+        ]),
+      },
+      sort_by: { type: 'string', enum: Object.keys(Chat.METRICS) },
+      order: { type: 'string', enum: ['desc', 'asc'] },
+      limit: { type: 'integer', minimum: 1, maximum: 50 },
+    },
+    required: ['metrics'],
+  },
+};
+
+function chatSystemPrompt() {
+  return [
+    'You are ChainSight Analyst, a data assistant embedded in a supply chain sales analytics dashboard.',
+    'Answer questions about the dataset below. Call the query_sales tool for every figure; never guess or invent numbers.',
+    'Make as many tool calls as needed (e.g. one per year to compute growth). Then answer in 2-5 short sentences of plain business English,',
+    'leading with the direct answer and its number. Use a small markdown table only when comparing 3+ items. Bold the key figure.',
+    'Money in USD ($1.2M style), percentages to 1 decimal, delivery time in days.',
+    'Definitions: revenue excludes returned and cancelled orders; gross_profit = revenue - cogs - shipping_cost; on_time_pct is over delivered orders;',
+    'late_orders = delivered after the promised date. The data is synthetic demo data for a fictional distributor.',
+    'If a question is outside this dataset, say so briefly and suggest a question you can answer.',
+    '', 'DATASET', Chat.schema(ROWS),
+  ].join('\n');
+}
+
+async function claudeChat(question, history) {
+  const messages = [];
+  for (const h of (history || []).slice(-8)) {
+    if ((h.role === 'user' || h.role === 'assistant') && typeof h.content === 'string' && h.content.trim()) messages.push({ role: h.role, content: h.content.slice(0, 4000) });
+  }
+  while (messages.length && messages[0].role !== 'user') messages.shift();
+  messages.push({ role: 'user', content: question });
+  const queries = [];
+  for (let step = 0; step < 8; step++) {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: process.env.CLAUDE_MODEL || 'claude-sonnet-5-5', max_tokens: 1200, system: chatSystemPrompt(), tools: [QUERY_TOOL], messages }),
+    });
+    if (!r.ok) throw new Error('Anthropic API ' + r.status + ' ' + (await r.text()).slice(0, 200));
+    const j = await r.json();
+    messages.push({ role: 'assistant', content: j.content });
+    const calls = (j.content || []).filter((c) => c.type === 'tool_use');
+    if (j.stop_reason !== 'tool_use' || !calls.length) {
+      return { source: 'claude', text: (j.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n').trim(), queries };
+    }
+    const results = calls.map((c) => {
+      const out = Chat.runQuery(ROWS, c.input || {});
+      queries.push(c.input);
+      return { type: 'tool_result', tool_use_id: c.id, content: JSON.stringify(out).slice(0, 20000) };
+    });
+    messages.push({ role: 'user', content: results });
+  }
+  throw new Error('Too many tool steps');
+}
+
 function readBody(req) {
   return new Promise((resolve) => {
     let b = '';
@@ -127,6 +201,23 @@ async function api(req, res, url) {
     } catch (e) {
       console.warn('Claude call failed, using rule-based insights:', e.message);
       return sendJson(res, 200, { source: 'rules', insights: rules });
+    }
+  }
+
+
+  if (p === '/api/chat' && req.method === 'POST') {
+    const body = await readBody(req);
+    const question = String(body.question || '').slice(0, 1000);
+    if (!question.trim()) return sendJson(res, 400, { error: 'Ask a question' });
+    const local = () => ({ source: 'built-in', ...Chat.answer(ROWS, question) });
+    if (!process.env.ANTHROPIC_API_KEY) return sendJson(res, 200, local());
+    try {
+      const ai = await claudeChat(question, body.history);
+      const helper = Chat.answer(ROWS, question); // chart/table for the same question when the parser understood it
+      return sendJson(res, 200, { ...ai, applyFilters: helper.applyFilters, suggestions: helper.suggestions });
+    } catch (e) {
+      console.warn('Claude chat failed, using built-in analyst:', e.message);
+      return sendJson(res, 200, { ...local(), note: 'Claude was unavailable, so the built-in analyst answered.' });
     }
   }
 

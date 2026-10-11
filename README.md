@@ -13,7 +13,9 @@ It has two front ends that read the same dataset:
 🔗 **Power BI report:** *add your Publish-to-web link here*
 🎥 **Demo video:** *add your Loom link here*
 
-![Executive overview](docs/screenshots/overview-midnight.png)
+![Executive overview](docs/screenshots/overview-horizon.png)
+
+![Ask the data chatbot](docs/screenshots/chat-horizon.png)
 
 ---
 
@@ -34,11 +36,14 @@ Today these answers are spread across spreadsheets. ChainSight puts them in one 
 | **Products & Customers** | Top 10 products · gross margin by category · top-customer table |
 | **Orders Explorer** | Search across order, customer, product, country and carrier · sortable columns · pagination · **Export CSV** of the filtered set |
 | **AI Insights** | Automatically generated findings: growth, risks, cost levers. If `ANTHROPIC_API_KEY` is set, **Claude** writes the executive summary from aggregated metrics only (raw rows are never sent). |
+| **Ask the Data (chatbot)** | Ask questions in plain English, such as "Which carrier has the worst on-time delivery?", "Compare Europe vs Asia Pacific profit" or "Monthly revenue trend in 2025". Answers come with a chart, a data table and a **Show this on the dashboard** button. With `ANTHROPIC_API_KEY` set, **Claude** answers by calling a `query_sales` tool that runs on the same KPI engine (an agentic tool-use loop). Without a key, a built-in analyst parses the question and runs the query in your browser. |
 | **Power BI Report** | Embedded Power BI report (configure in `public/js/config.js`) |
 
 - **Global filters** (date range, region, category, segment, ship mode, carrier) apply to every view. Quick buttons switch between 2024, 2025 and All.
 - **Clear empty state** when no orders match the filters.
-- **5 themes**: Midnight, Aurora, Daylight, Sandstone and Corporate (Power BI style). The choice is remembered per browser.
+- **Interactive analysis**: click any bar, donut slice, heatmap cell or warehouse row to filter every view. Active filters appear as removable chips.
+- **Rich visuals**: KPI tiles with sparklines, a region × category revenue heatmap, a segment donut, and target lines.
+- **6 themes**: Horizon (default, light), Daylight, Sandstone, Corporate (Power BI style), Midnight and Aurora. The choice is remembered per browser.
 - **Colorblind-checked chart palette**. Colors are tied to entities, so a region keeps its color when the filters change.
 - **Responsive** down to phone width.
 - **Zero runtime dependencies**: the server uses Node's built-in `http` module and Chart.js is vendored, so there's no `npm install` to fail.
@@ -79,6 +84,7 @@ Optional: copy `.env.example` to `.env` and add `ANTHROPIC_API_KEY` to turn on C
 | `npm run generate` | Regenerate the dataset |
 | `npm run powerbi` | Rebuild the Power BI star-schema CSVs in `powerbi/data/` |
 | `npm test` | Smoke-test every API endpoint |
+| `node scripts/chat-test.js "your question"` | Try the built-in analyst from the terminal |
 
 ## REST API
 | Endpoint | Returns |
@@ -89,6 +95,7 @@ Optional: copy `.env.example` to `.env` and add `ANTHROPIC_API_KEY` to turn on C
 | `GET /api/breakdown/:dimension` | KPIs grouped by `region`, `carrier`, `month`, `product_name`, and so on |
 | `GET /api/orders?page=1&size=50&q=atlas` | Paged, filtered orders |
 | `POST /api/insights` (JSON filters) | Insights (Claude if a key is set, rule-based otherwise) |
+| `POST /api/chat` `{question, history}` | Chatbot answer (Claude with tool use if a key is set, built-in analyst otherwise) |
 
 ## Deploy the portal (GitHub Pages)
 1. Push to `main`.
@@ -105,7 +112,9 @@ See **[powerbi/POWERBI-GUIDE.md](powerbi/POWERBI-GUIDE.md)**. It covers the star
 │   ├── index.html
 │   ├── css/styles.css         # 5 themes via CSS custom properties
 │   ├── js/analytics.js        # Shared KPI engine (browser + Node)
-│   ├── js/app.js              # Views, charts, filters, explorer
+│   ├── js/app.js              # Views, charts, filters, explorer, click-to-filter
+│   ├── js/chat-engine.js      # NL question → query engine (browser + Claude tool)
+│   ├── js/chat-ui.js          # Ask-the-data chat panel
 │   ├── js/themes.js, config.js
 │   ├── data/orders.json       # Dataset for the browser
 │   └── vendor/chart.umd.js    # Chart.js 4.4.1 (MIT)

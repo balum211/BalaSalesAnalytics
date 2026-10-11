@@ -8,12 +8,12 @@ const base = process.argv[2] || 'http://localhost:3000';
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   const shots = [
-    ['midnight', 'overview'], ['midnight', 'logistics'], ['daylight', 'products'], ['corporate', 'orders'],
+    ['horizon', 'overview'], ['horizon', 'logistics'], ['midnight', 'overview'], ['midnight', 'logistics'], ['daylight', 'products'], ['corporate', 'orders'],
     ['aurora', 'insights'], ['sandstone', 'overview'], ['corporate', 'overview'], ['daylight', 'powerbi'],
   ];
   for (const [theme, view] of shots) {
     await page.goto(`${base}/#${view}`);
-    await page.evaluate((t) => { localStorage.setItem('cs-theme', t); }, theme);
+    await page.evaluate((t) => { localStorage.setItem('cs-theme-v2', t); }, theme);
     await page.reload();
     await page.waitForTimeout(900);
     await page.screenshot({ path: `docs/screenshots/${view}-${theme}.png`, fullPage: true });
