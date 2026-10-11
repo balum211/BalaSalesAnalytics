@@ -1,4 +1,4 @@
-// Theme registry. Surface colors live in css/styles.css under [data-theme="..."].
+// Theme registry. Surface colors live in css/styles.css under [data-skin="..."].
 // Series colors use a colorblind-validated categorical palette, stepped separately for light and dark surfaces.
 window.THEMES = {
   midnight:  { label: 'Midnight',  mode: 'dark',  swatch: ['#0b1220', '#3987e5'] },

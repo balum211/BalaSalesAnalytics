@@ -1,5 +1,5 @@
 /* ===== Themes ===== */
-:root, [data-theme="midnight"] {
+:root, [data-skin="midnight"] {
   color-scheme: dark;
   --bg: #0b1220;
   --bg-grad: radial-gradient(1200px 600px at 85% -10%, rgba(57,135,229,.18), transparent 60%), radial-gradient(900px 500px at -10% 110%, rgba(144,133,233,.12), transparent 60%);
@@ -16,7 +16,7 @@
   --good: #2fbf71; --warn: #e3a008; --bad: #ef5d5d;
   --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px rgba(0,0,0,.25);
 }
-[data-theme="aurora"] {
+[data-skin="aurora"] {
   color-scheme: dark;
   --bg: #0b1517;
   --bg-grad: radial-gradient(1000px 600px at 90% -20%, rgba(47,212,167,.20), transparent 60%), radial-gradient(900px 600px at 0% 120%, rgba(144,133,233,.20), transparent 60%);
@@ -33,7 +33,7 @@
   --good: #2fd4a7; --warn: #f2b134; --bad: #ff6b6b;
   --shadow: 0 10px 30px rgba(0,0,0,.3);
 }
-[data-theme="daylight"] {
+[data-skin="daylight"] {
   color-scheme: light;
   --bg: #f4f6f9;
   --bg-grad: radial-gradient(1000px 500px at 90% -10%, rgba(42,120,214,.10), transparent 60%);
@@ -50,7 +50,7 @@
   --good: #12804a; --warn: #a86b00; --bad: #c62828;
   --shadow: 0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
 }
-[data-theme="sandstone"] {
+[data-skin="sandstone"] {
   color-scheme: light;
   --bg: #f6f1e8;
   --bg-grad: radial-gradient(1000px 500px at 100% -10%, rgba(194,87,26,.10), transparent 60%);
@@ -67,7 +67,7 @@
   --good: #3f7d20; --warn: #a86b00; --bad: #b3261e;
   --shadow: 0 1px 2px rgba(60,40,20,.06), 0 8px 24px rgba(60,40,20,.07);
 }
-[data-theme="corporate"] {
+[data-skin="corporate"] {
   color-scheme: light;
   --bg: #f3f2f1;
   --bg-grad: none;

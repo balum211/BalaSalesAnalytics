@@ -43,7 +43,7 @@
   // ---------- theme ----------
   function setTheme(name) {
     if (!window.THEMES[name]) name = 'midnight';
-    document.documentElement.setAttribute('data-theme', name);
+    document.documentElement.setAttribute('data-skin', name);
     store.set('cs-theme', name);
     $$('.swatch').forEach((s) => s.setAttribute('aria-checked', s.dataset.theme === name ? 'true' : 'false'));
     if (state.rows.length) renderView();
@@ -62,7 +62,7 @@
       wrap.appendChild(b);
     });
   }
-  const series = () => window.SERIES[window.THEMES[document.documentElement.dataset.theme]?.mode === 'light' ? 'light' : 'dark'];
+  const series = () => window.SERIES[window.THEMES[document.documentElement.dataset.skin]?.mode === 'light' ? 'light' : 'dark'];
 
   // ---------- charts ----------
   function baseOptions(extra = {}) {
