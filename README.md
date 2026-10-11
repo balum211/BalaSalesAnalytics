@@ -55,7 +55,7 @@ The generator builds in realistic patterns: Q4 seasonality, 18% year-over-year g
 | order_id, order_date, ship_date, delivery_date | Order lifecycle |
 | region, country, warehouse | Geography and fulfilment node |
 | customer_segment, customer_name | Retail · Wholesale · E-commerce · Distributor |
-| product_category, product_name | 6 categories, 26 products |
+| product_category, product_name | 6 categories, 27 products |
 | ship_mode, carrier | Road · Ocean · Air · Rail; 5 fictional carriers |
 | quantity, unit_price, discount | Order line |
 | revenue, cogs, shipping_cost, gross_profit | USD. Revenue is 0 for returned or cancelled orders. |
